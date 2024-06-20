@@ -82,3 +82,18 @@ footer {
     font-size: 2.5em; /* Cambiar el tamaño de la fuente (opcional) */
     color: #333; /* Cambiar el color del texto (opcional) */
   }
+
+
+  .table-container {
+    overflow-x: auto; /* Añade desplazamiento horizontal si es necesario */
+    margin: 0; /* Elimina márgenes innecesarios */
+    padding: 0; /* Elimina padding innecesario */
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+#menu-table {
+    width: 100%; /* Asegúrate de que la tabla ocupe todo el ancho del contenedor */
+}

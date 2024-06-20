@@ -6,6 +6,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
 from django.shortcuts import render, get_object_or_404
 from .models import Programacion
+from reportlab.lib.units import cm
+from reportlab.platypus import Paragraph, Spacer
 
 def generar_ticket(request, usuario_id, fecha):
     try:
@@ -32,9 +34,14 @@ def generar_ticket(request, usuario_id, fecha):
         # Agregar el contenido al PDF
         content = []
         content.append(Paragraph("Ticket Menu", styles['Title']))
-        content.append(Paragraph(f"Usuario ID: {datos.usuario.id}", centered_style))
+        content.append(Paragraph(f"Perfil: {datos.usuario.tipo_usuario}", centered_style))
+        content.append(Paragraph(f"Nombre: {datos.usuario.nombre} {datos.usuario.apellido}", centered_style))
+        content.append(Spacer(0.5, 0.5 * cm))
         content.append(Paragraph(f"Fecha: {datos.fecha_servicio.strftime('%Y-%m-%d')}", centered_style))
-        content.append(Paragraph(f"Cantidad Almuerzo: {datos.cantidad_almuerzo}", centered_style))
+        content.append(Paragraph("", centered_style))
+        content.append(Paragraph(f"Menu: {datos.nom_menu}", centered_style))
+        content.append(Paragraph("", centered_style))
+        content.append(Paragraph(f"Cantidad : {datos.cantidad_almuerzo}", centered_style))
         # Agregar más detalles del ticket según tus necesidades
 
         doc.build(content)

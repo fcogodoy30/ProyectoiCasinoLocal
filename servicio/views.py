@@ -47,16 +47,19 @@ def iniciosession(request):
             return render(request,'login/login.html',{
                           'error': 'Rut o Contraseña incorrecto'})
         else:
-            login(request, user)
-            request.session['user_data'] = {
-                'id' : user.id,
-                'username': user.username,
-                'nombre': user.first_name,
-                'apellido': user.last_name,
-                'super': user.is_superuser
-                
-            }
-            return redirect('principal')
+            activo = Usuarios.objects.filter(rut = request.POST['username'], activo = 1)
+            if activo:
+                login(request, user)
+                request.session['user_data'] = {
+                    'id' : user.id,
+                    'username': user.username,
+                    'nombre': user.first_name,
+                    'apellido': user.last_name
+                }
+                return redirect('principal')
+            else:
+                return render(request,'login/login.html',{
+                          'error': 'Rut Inactivo'})
 
 #Editar Usuarios
 @login_required
@@ -146,9 +149,9 @@ def usuarios(request):
 def usuarioslistas(request):
     consulta = request.GET.get('q')
     if consulta:
-        usuarios = Usuarios.objects.filter(rut__icontains=consulta).order_by('rut')
+        usuarios = Usuarios.objects.filter(rut__icontains=consulta, tipo_usuario__in=[1, 2]).order_by('rut')
     else:
-        usuarios = Usuarios.objects.all().order_by('rut') 
+        usuarios = Usuarios.objects.filter(tipo_usuario__in=[1, 2]).order_by('rut') 
     
     tipousuario = TipoUsuario.objects.filter(id__in=[1, 2]).order_by('id')
     
@@ -174,23 +177,19 @@ def diaDeSemana():
 def programarmenu(request):
         user_id = request.user.id
         iniSem, finSem = diaDeSemana()
-        
         # Consultar las programaciones del usuario para la semana
         programaciones_usuario = Programacion.objects.filter(
             usuario__id_user=user_id,
             fecha_servicio__range=[iniSem, finSem]
         )
-        
-        # Verificar si alguna de las fechas está activa
-        alguna_fecha_activa = any(prog.casino_colacion.id_estado == 1 for prog in programaciones_usuario)
-        
+
         # Si alguna fecha está activa, redirige a una página de error o muestra un mensaje
-        if alguna_fecha_activa:
+        if programaciones_usuario:
             semana_activa = Programacion.objects.filter(
             usuario__id_user=user_id,
-            casino_colacion__id_estado=1
+            fecha_servicio__range=[iniSem, finSem]
             ).first()
-            mensaje = f"Ya has seleccionado Menu de Semana activa: del {semana_activa.fecha_servicio} al {semana_activa.fecha_servicio + timedelta(days=6)}."
+            mensaje = f"Tu menu del dia {semana_activa.fecha_servicio} al {semana_activa.fecha_servicio + timedelta(days=4)} ya fue seleccionado."
             return render(request, 'error.html', {'message': mensaje})
         
         # Si no hay fechas activas, continúa con la lógica normal
@@ -227,7 +226,7 @@ def editamenu(request, id):
             'opciones': opcion,
             'id_menu': id
         }
-        return render(request, 'admin/edit_agergarmenu.html', context)
+        return render(request, 'admin/edit_agregarmenu.html', context)
     else:
         id_menu = request.POST.get('id_menu')
         titulo = request.POST.get('titulo')
@@ -335,17 +334,19 @@ def cambiar_estado_menu(request):
 @csrf_exempt  # Desactiva la verificación CSRF para facilitar el desarrollo
 def guardar_selecciones(request):
     if request.method == 'POST':
+        print("ACAAA")
         data = json.loads(request.body)
         usuario = Usuarios.objects.get(id_user_id=request.user.id)  # Asegúrate de que el usuario esté autenticado
-        
         for item in data:
             fecha_servicio = datetime.strptime(item['fecha_servicio'], '%Y-%m-%d').date()
             casino_colacion = CasinoColacion.objects.get(id=item['opcion_id'])
             cantidad = item['cant']
-
+            nom_menu = item['nom_menu']
+            
             Programacion.objects.create(
                 usuario=usuario,
-                casino_colacion=casino_colacion,
+                menu_id=casino_colacion.id,
+                nom_menu=nom_menu,
                 fecha_servicio=fecha_servicio,
                 cantidad_almuerzo=cantidad,
                 impreso=0

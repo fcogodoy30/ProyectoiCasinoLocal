@@ -11,9 +11,6 @@ function validateSelection() {
   let allSelected = true;
   const selections = [];
 
-  alert(allSelected);
-  alert(selections);
-
   blocks.forEach(block => {
     const selectedButton = block.querySelector('.button.selected');
     if (!selectedButton) {
@@ -22,10 +19,13 @@ function validateSelection() {
       const selectedValue = selectedButton.value;
       const fechaServicio = selectedButton.getAttribute('data-fecha');
       const cant = block.querySelector(`input[id^="quantity-"]`).value;
+      const nom_menu = block.querySelector('input#nom_menu').value;
+
       selections.push({
         fecha_servicio: fechaServicio,
         opcion_id: selectedValue,
-        cant: cant
+        cant: cant,
+        nom_menu: nom_menu
       });
     }
   });
@@ -34,13 +34,12 @@ function validateSelection() {
     
     document.querySelector('[name="brnEnviar"]').style.display = 'none';
     document.querySelector('.spinner-border').style.display = 'block';
-    alert("para")
     // Enviar los datos seleccionados al servidor usando fetch (AJAX)
     fetch('/guardar_selecciones/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken') // Añade el token CSRF si estás usando Django
+        'X-CSRFToken': getCookie('csrftoken') // AÃ±ade el token CSRF si estÃ¡s usando Django
       },
       body: JSON.stringify(selections)
     })
@@ -60,15 +59,15 @@ function validateSelection() {
     })
     .catch((error) => {
       console.error('Error:', error);
-      window.location.href = `/principal/?message=${encodeURIComponent('Ocurrió un error al procesar la solicitud.')}`;
+      window.location.href = `/principal/?message=${encodeURIComponent('Ocurrio un error al procesar la solicitud.')}`;
     });
 
   } else {
-    alert("Por favor, selecciona una opción en todos los bloques.");
+    alert("Por favor, selecciona una opcion en todos los bloques.");
   }
 }
 
-// Función auxiliar para obtener el token CSRF (si usas Django)
+// FunciÃ³n auxiliar para obtener el token CSRF (si usas Django)
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {

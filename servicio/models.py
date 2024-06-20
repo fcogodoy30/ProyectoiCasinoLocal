@@ -48,13 +48,13 @@ class Usuarios(models.Model):
 
 class Programacion(models.Model):
     usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
-    casino_colacion = models.ForeignKey(CasinoColacion, on_delete=models.CASCADE)
+    menu_id = models.IntegerField()  # Campo de datos simple para el ID del menú
+    nom_menu = models.CharField(max_length=255)
     fecha_servicio = models.DateField()
-    cantidad_almuerzo = models.IntegerField(default=1)  # Por defecto 1 para usuario simple, +1 para superusuario
-    fecha_ingreso = models.DateTimeField(auto_now_add=True)
-    impreso = models.IntegerField(choices=[(0, 'No Impreso'), (1, 'Impreso')], default=0)
+    cantidad_almuerzo = models.IntegerField()
+    impreso = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Programación para {self.usuario} en {self.casino_colacion} el {self.fecha_servicio}"
+        return f"{self.nom_menu} - {self.fecha_servicio}"
     
     

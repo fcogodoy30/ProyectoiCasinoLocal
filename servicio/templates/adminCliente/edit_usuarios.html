@@ -14,7 +14,7 @@
                 {% csrf_token %}
                 
                     <center><h4 class="py-2" style="color:white">EDITAR USUARIO</h4></center> 
-                    <input type="text" name="id_user" value="{{ id_user }}">
+                    <input type="hidden" name="id_user" value="{{ id_user }}">
                     <div class="row">
                         <div class="col"> 
                             <div class="form-group">
@@ -71,7 +71,10 @@
                     </div>
                     <br>
                     <div id="mensaje-error" class="error-message"></div>
-                    <center><button type="submit" class="btn btn-primary bg-warning" onclick="return validatePasswords()">Actualizar</button></center>
+                    <center><button type="submit" class="btn btn-primary bg-warning" onclick="return validatePasswords()">Actualizar</button><br><br>
+                            <a href="{% url 'usuarioslistas' %}" > <h5>Cancelar</h5></a> </a>
+                    </center>
+
 
                     {% endfor %}
                     {% if messages %}
@@ -95,8 +98,8 @@
             <a href="/usuarioslistas/" class="button mostrar-todo">Mostrar Todo</a>
         </form>
         <br>
-        <div class="table-container">
-            <table id="menu-table" class="display" style="width:100%">
+        <div class="table-responsive">
+            <table id="menu-table" class="display table" style="width:100%">
                 <thead>
                     <tr>
                         <th>Rut</th>
