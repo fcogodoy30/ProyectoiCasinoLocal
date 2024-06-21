@@ -42,8 +42,6 @@ urlpatterns = [
     path('adminCliente/usuarios/', views.usuarios, name = 'usuarios'),
     path('adminCliente/edit_usuarios/<int:id>/', views.editusuario, name = 'editusuario'),
     
-
-    
     
      path('cambiar_estado_usuario/', views.cambiar_estado_usuario, name='cambiar_estado_usuario'),
      path('cambiar_estado_menu/', views.cambiar_estado_menu, name='cambiar_estado_usuario'),

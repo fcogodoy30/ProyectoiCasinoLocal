@@ -6,12 +6,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/principal.css' %}" />
 
 <div class="text-center">
-  
-  <h3 class="titu"> TOTEM</h3>
+  <h3 class="titu">Bienvenido</h3>
   <br>
 </div>    
 <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 50vh; max-width: 500px; background-color: white;">
-  
    <div class="text-center mb-3">
       <!-- Botón Programar siguiente semana del usuario -->
       <a href="{% url 'programarmenu' %}">
@@ -21,22 +19,28 @@
       </button>
     </a>
       <!-- Botón Imprime Ticket -->
-      <a href="{% url 'generar_ticket' usuario_id=user.usuarios.id fecha=current_date|date:"Y-m-d" %}">
+      <a href="{% url 'generar_ticket' usuario_id=user.usuarios.id fecha=current_date|date:'Y-m-d' %}">
         <button type="button" class="btn btn-outline-primary mx-2" style="border-color: black;">
             <img src="{% static 'img/comer.png' %}" alt="Comer" style="width: 150px; height: 150px;"><br>
-            <span style="color: black;"><strong class="literal" >COMER</strong></span>
+            <span style="color: black;"><strong class="literal">COMER</strong></span>
         </button>
     </a>
+    <br><br>
+
+    <!--MENSAJE PARA CUANDO SE GUARDE SE ENVIA POR JS-->
+    <center><h4><div id="message" style="color: black;"></div></h4></center>
+
+    <!--MENSAJE CUANDO SE LLAMA A LA FUNCION DEL TICKET-->
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+            <div style="color: black;">
+                <h4>{{ message }}</h4>
+            </div>
+        {% endfor %}
     </div>
-
-    
-  
-</div>
-
-<center><h4><div id="message"></div></h4></center>
+{% endif %}
 
 
 <script src="{% static 'js/principal.js' %}"></script>
-
-
 {% endblock %}

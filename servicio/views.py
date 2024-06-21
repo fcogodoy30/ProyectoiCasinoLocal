@@ -72,7 +72,6 @@ def editusuario(request, id):
         else:
             usuario = Usuarios.objects.filter(id_user_id=id)
         
-        print("USUARIO", usuario)
         tipousuario = TipoUsuario.objects.all().order_by('id')
         context = {
             'usuarios': usuario,
@@ -190,7 +189,9 @@ def programarmenu(request):
             fecha_servicio__range=[iniSem, finSem]
             ).first()
             mensaje = f"Tu menu del dia {semana_activa.fecha_servicio} al {semana_activa.fecha_servicio + timedelta(days=4)} ya fue seleccionado."
-            return render(request, 'error.html', {'message': mensaje})
+            #return render(request, 'error.html', {'message': mensaje})
+            messages.success(request, mensaje)
+            return redirect('principal')
         
         # Si no hay fechas activas, continúa con la lógica normal
         
@@ -334,7 +335,6 @@ def cambiar_estado_menu(request):
 @csrf_exempt  # Desactiva la verificación CSRF para facilitar el desarrollo
 def guardar_selecciones(request):
     if request.method == 'POST':
-        print("ACAAA")
         data = json.loads(request.body)
         usuario = Usuarios.objects.get(id_user_id=request.user.id)  # Asegúrate de que el usuario esté autenticado
         for item in data:

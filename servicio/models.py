@@ -53,6 +53,9 @@ class Programacion(models.Model):
     fecha_servicio = models.DateField()
     cantidad_almuerzo = models.IntegerField()
     impreso = models.BooleanField(default=False)
+    fecha_impreso = models.DateTimeField(null=True, blank=True)
+    fecha_seleccion = models.DateTimeField(auto_now_add=True)
+    
 
     def __str__(self):
         return f"{self.nom_menu} - {self.fecha_servicio}"
