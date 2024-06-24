@@ -93,8 +93,8 @@
     <div class="col-md-8 bg-white">
         <center><h3 class="titu">Lista Usuarios</h3></center>
         <form method="GET" action="/usuarioslistas/">
-            <input type="text" id="searchInput" name="q" placeholder="Buscar Rut" value="{{ query|default_if_none:'' }}">
-            <button type="submit">Buscar</button>
+            <!-- <input type="text" id="searchInput" name="q" placeholder="Buscar Rut" value="{{ query|default_if_none:'' }}">
+            <button type="submit">Buscar</button>-->
             <a href="/usuarioslistas/" class="button mostrar-todo">Mostrar Todo</a>
         </form>
         <br>
@@ -123,9 +123,11 @@
                             </div>
                           </td>
                         <td>{% if usuario.tipo_usuario_id == 1 %}
-                            admin 
+                            Empresa
                             {% elif usuario.tipo_usuario_id == 2 %}
                             usuario
+                            {% elif usuario.tipo_usuario_id == 3 %}
+                            Soporte
                             {% endif%}
                         </td>
                        

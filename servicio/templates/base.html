@@ -47,6 +47,7 @@
                     <ul class="dropdown-menu">
                       {% if user.usuarios.tipo_usuario.tipo == 'Soporte' %}
                       <li><a class="dropdown-item" href="{% url 'agregarmenu' %}" >Programacion Menu</a></li>
+                      <li><a class="dropdown-item" href="{% url 'control_descarga' %}" >Control/descarga</a></li>
                       <li><hr class="dropdown-divider"></li>
                       {% endif %} 
                       <li><a class="dropdown-item" href="{% url 'usuarios' %}">Usuarios</a></li>

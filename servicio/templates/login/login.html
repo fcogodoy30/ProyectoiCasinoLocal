@@ -23,10 +23,10 @@
             <div class="card-body p-5 text-center">
             <form name = "loginForm" method="POST" action="{% url 'iniciosession' %}">
                     {% csrf_token %}
-                    
-              <img src="{% static 'img/logo.jpg' %}" alt="Logo" width="160" height="160">
-              <h3 class="mb-5">Inicio Sesion</h3>
-  
+              <h3> LOGIN </h3>
+              <br>
+              <img src="{% static 'img/logoEmpresa.jpg' %}" alt="Logo" width="160" height="160">
+              <br><br>
               <div class="form-outline mb-4">
                 
                 <input type="text" class="form-control me-2" id="id_rut" name="username" placeholder="Rut" required>
@@ -67,6 +67,10 @@
   <script src="{% static 'js/validaRut.js' %}"></script>
    <!-- jQuery -->
    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-   
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('id_rut').focus();
+    });
+</script>
 </body>
 </html>

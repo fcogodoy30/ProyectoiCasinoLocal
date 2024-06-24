@@ -65,17 +65,22 @@ def iniciosession(request):
 @login_required
 def editusuario(request, id):
     if request.method == 'GET':
-        consulta = request.GET.get('q')
+        #consulta = request.GET.get('q')
+        # Guardamos el Perfil que esta solicitando el dato
+        usuario_actual = Usuarios.objects.get(id_user=request.user)
+        tipo_usuario_actual = usuario_actual.tipo_usuario
         
-        if consulta:
-            usuario = Usuarios.objects.filter(rut__icontains=consulta).order_by('rut')
+        if tipo_usuario_actual.tipo == 'Soporte':
+            usuario = Usuarios.objects.filter(id_user_id=id)
+            tipousuario = TipoUsuario.objects.all().order_by('id')
         else:
             usuario = Usuarios.objects.filter(id_user_id=id)
+            tipousuario = TipoUsuario.objects.filter(id__in=[1, 2]).order_by('id')
+    
         
-        tipousuario = TipoUsuario.objects.all().order_by('id')
         context = {
             'usuarios': usuario,
-            'query': consulta,
+            #'query': consulta, #Resultado para buscador comentado
             'tipousuario': tipousuario,
             'id_user' : id
         }
@@ -97,7 +102,7 @@ def editusuario(request, id):
         user.save()
         
         tipo_usuario = get_object_or_404(TipoUsuario, pk=tiposus)
-        
+                
         # Aqui guardamos los datos en la tabla del usuario
         usuario = get_object_or_404(Usuarios, id_user=id_user)
         usuario.nombre = nombre
@@ -147,13 +152,25 @@ def usuarios(request):
 @login_required
 def usuarioslistas(request):
     consulta = request.GET.get('q')
+    # Guardamos el Perfil que esta solicitando el dato
+    usuario_actual = Usuarios.objects.get(id_user=request.user)
+    tipo_usuario_actual = usuario_actual.tipo_usuario
+    
     if consulta:
-        usuarios = Usuarios.objects.filter(rut__icontains=consulta, tipo_usuario__in=[1, 2]).order_by('rut')
+        if tipo_usuario_actual.tipo == 'Soporte':
+            usuarios = Usuarios.objects.filter(rut__icontains=consulta).order_by('rut')
+            tipousuario = TipoUsuario.objects.all().order_by('id')
+        else:
+            usuarios = Usuarios.objects.filter(rut__icontains=consulta, tipo_usuario__in=[1, 2]).order_by('rut')
+            tipousuario = TipoUsuario.objects.filter(id__in=[1, 2]).order_by('id')
     else:
-        usuarios = Usuarios.objects.filter(tipo_usuario__in=[1, 2]).order_by('rut') 
-    
-    tipousuario = TipoUsuario.objects.filter(id__in=[1, 2]).order_by('id')
-    
+        if tipo_usuario_actual.tipo == 'Soporte':
+            usuarios = Usuarios.objects.all().order_by('rut') 
+            tipousuario = TipoUsuario.objects.all().order_by('id')
+        else:
+            usuarios = Usuarios.objects.filter(tipo_usuario__in=[1, 2]).order_by('rut')
+            tipousuario = TipoUsuario.objects.filter(id__in=[1, 2]).order_by('id')
+            
     context = {
         'usuarios': usuarios,
         'query': consulta,
@@ -165,11 +182,15 @@ def usuarioslistas(request):
 # CREACION METODO SELECCION SEMANA ACTIVA
 def diaDeSemana():
     # Obtener la fecha actual
-    fechaActual = timezone.now().date()
-    # Calcular el inicio y fin de la semana (lunes a viernes)
+    fechaActual = datetime.now().date()
+    # Calcular el inicio de la semana actual (lunes)
     inicioSem = fechaActual - timedelta(days=fechaActual.weekday())
-    finSem = inicioSem + timedelta(days=4)   
-    return inicioSem, finSem
+    
+    # Calcular el inicio y fin de la siguiente semana (lunes a viernes)
+    inicioSemSiguiente = inicioSem + timedelta(days=7)
+    finSemSiguiente = inicioSemSiguiente + timedelta(days=4)
+
+    return inicioSemSiguiente, finSemSiguiente
 
 #Programar menu para semana 
 @login_required
@@ -343,6 +364,8 @@ def guardar_selecciones(request):
             cantidad = item['cant']
             nom_menu = item['nom_menu']
             
+            print ("cantidad: " + cantidad)
+            
             Programacion.objects.create(
                 usuario=usuario,
                 menu_id=casino_colacion.id,
@@ -355,3 +378,7 @@ def guardar_selecciones(request):
         return JsonResponse({ 'status': 'success' })  # Redirige a la página principal
     return JsonResponse({'status': 'fail'}, status=400)
 
+#control y descarga
+
+def control_descarga(request):
+    return render(request, 'admin/control_descarga.html')

@@ -29,22 +29,25 @@ urlpatterns = [
     path('cerrarsession/', views.cerrarsession, name = 'cerrarsession'),
     path('iniciosession/', views.iniciosession, name = 'iniciosession'),
     
+    #URL PRINCIPAL
     path('principal/programarmenu/', views.programarmenu, name='programarmenu'),
     path('guardar_selecciones/', views.guardar_selecciones, name='guardar_selecciones'),
     path('ticket/<int:usuario_id>/<str:fecha>/', ticket.generar_ticket, name='generar_ticket'),
     
+    #VISTA MENU SOPORTE - CASINO
     path('menu_lista/', views.menu_lista, name='menu_lista'),
     path('agregarmenu/', views.agregarmenu, name='agregarmenu'),
     path('edit_agregarmenu/<int:id>/', views.editamenu, name='editarMenu'),
+    path('cambiar_estado_menu/', views.cambiar_estado_menu, name='cambiar_estado_usuario'),
     path('eliminar_menu/<int:id>/', views.eliminarMenu, name='eliminarMenu'),
-     
+    path('control_descarga/', views.control_descarga, name='control_descarga'),
+    
+    #URL USUARIOS SOPORTE - EMPRESA
     path('usuarioslistas/', views.usuarioslistas, name='usuarioslistas'),
+    path('cambiar_estado_usuario/', views.cambiar_estado_usuario, name='cambiar_estado_usuario'),
     path('adminCliente/usuarios/', views.usuarios, name = 'usuarios'),
     path('adminCliente/edit_usuarios/<int:id>/', views.editusuario, name = 'editusuario'),
     
-    
-     path('cambiar_estado_usuario/', views.cambiar_estado_usuario, name='cambiar_estado_usuario'),
-     path('cambiar_estado_menu/', views.cambiar_estado_menu, name='cambiar_estado_usuario'),
      
      
      

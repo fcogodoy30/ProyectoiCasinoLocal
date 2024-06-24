@@ -26,20 +26,19 @@
               <input type="hidden" name = "nom_menu" id="nom_menu" value="{{ opcion.titulo }}" class="nom_menu">
               <p>{{ opcion.descripcion }}</p>
             </button>
-            {% if user.usuarios.tipo_usuario.tipo == 'Empresa' %}
-              <div class="has-addons">
-                <button onclick="decrement('quantity-{{ opcion.id }}')">-</button>
-                <input type="text" name = "cant" id="quantity-{{ opcion.id }}" value="1" class="cant">
-                <button onclick="increment('quantity-{{ opcion.id }}')">+</button>
-            </div>
-            {% else %}
-            <div class="has-addons">
-              <input type="hidden" name = "cant" id="quantity-{{ opcion.id }}" value="1" class="cant">
-          </div>
-          {% endif %}
-
-
           {% endfor %}
+
+          {% if user.usuarios.tipo_usuario.tipo == 'Empresa' %}
+          <div class="has-addons">
+            <button onclick="decrement('quantity-{{ fecha|date:"Y-m-d" }}-{{ opcion.id }}')">-</button>
+            <input type="text" name="cant" id="quantity-{{ fecha|date:"Y-m-d" }}-{{ opcion.id }}" value="1" class="cant">
+            <button onclick="increment('quantity-{{ fecha|date:"Y-m-d" }}-{{ opcion.id }}')">+</button>
+          </div>
+        {% else %}
+          <div class="has-addons">
+            <input type="hidden" name="cant" id="quantity-{{ fecha|date:"Y-m-d" }}-{{ opcion.id }}" value="1" class="cant">
+          </div>
+        {% endif %}
         </div>
       </div>
     </div>
