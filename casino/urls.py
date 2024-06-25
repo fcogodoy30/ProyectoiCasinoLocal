@@ -31,6 +31,7 @@ urlpatterns = [
     
     #URL PRINCIPAL
     path('principal/programarmenu/', views.programarmenu, name='programarmenu'),
+    path('principal/programarmenu_emp/', views.programarmenu, name='programarmenu_emp'),
     path('guardar_selecciones/', views.guardar_selecciones, name='guardar_selecciones'),
     path('ticket/<int:usuario_id>/<str:fecha>/', ticket.generar_ticket, name='generar_ticket'),
     

@@ -71,7 +71,7 @@ def editusuario(request, id):
         tipo_usuario_actual = usuario_actual.tipo_usuario
         
         if tipo_usuario_actual.tipo == 'Soporte':
-            usuario = Usuarios.objects.filter(id_user_id=id)
+            usuario = Usuarios.objects.filter(id_user_id=id).order_by('tipo_usuario')
             tipousuario = TipoUsuario.objects.all().order_by('id')
         else:
             usuario = Usuarios.objects.filter(id_user_id=id)
@@ -151,99 +151,41 @@ def usuarios(request):
 # lista de usuarios
 @login_required
 def usuarioslistas(request):
-    consulta = request.GET.get('q')
-    # Guardamos el Perfil que esta solicitando el dato
+    #consulta = request.GET.get('q')
+        # Guardamos el Perfil que esta solicitando el dato
     usuario_actual = Usuarios.objects.get(id_user=request.user)
     tipo_usuario_actual = usuario_actual.tipo_usuario
-    
-    if consulta:
-        if tipo_usuario_actual.tipo == 'Soporte':
-            usuarios = Usuarios.objects.filter(rut__icontains=consulta).order_by('rut')
-            tipousuario = TipoUsuario.objects.all().order_by('id')
-        else:
-            usuarios = Usuarios.objects.filter(rut__icontains=consulta, tipo_usuario__in=[1, 2]).order_by('rut')
-            tipousuario = TipoUsuario.objects.filter(id__in=[1, 2]).order_by('id')
+        
+    if tipo_usuario_actual.tipo == 'Soporte':
+        usuarios = Usuarios.objects.all().order_by('tipo_usuario')
+        tipousuario = TipoUsuario.objects.all().order_by('id')
     else:
-        if tipo_usuario_actual.tipo == 'Soporte':
-            usuarios = Usuarios.objects.all().order_by('rut') 
-            tipousuario = TipoUsuario.objects.all().order_by('id')
-        else:
-            usuarios = Usuarios.objects.filter(tipo_usuario__in=[1, 2]).order_by('rut')
-            tipousuario = TipoUsuario.objects.filter(id__in=[1, 2]).order_by('id')
-            
+        usuarios = Usuarios.objects.all().order_by('tipo_usuario')
+        tipousuario = TipoUsuario.objects.filter(id__in=[1, 2]).order_by('id')
+                
     context = {
         'usuarios': usuarios,
-        'query': consulta,
+        #'query': consulta, #Resultado para buscador comentado
         'tipousuario': tipousuario,
         'messages': messages.get_messages(request),
     }
     return render(request, 'adminCliente/usuarios.html', context)
 
-# CREACION METODO SELECCION SEMANA ACTIVA
-def diaDeSemana():
-    # Obtener la fecha actual
-    fechaActual = datetime.now().date()
-    # Calcular el inicio de la semana actual (lunes)
-    inicioSem = fechaActual - timedelta(days=fechaActual.weekday())
-    
-    # Calcular el inicio y fin de la siguiente semana (lunes a viernes)
-    inicioSemSiguiente = inicioSem + timedelta(days=7)
-    finSemSiguiente = inicioSemSiguiente + timedelta(days=4)
-
-    return inicioSemSiguiente, finSemSiguiente
-
-#Programar menu para semana 
-@login_required
-def programarmenu(request):
-        user_id = request.user.id
-        iniSem, finSem = diaDeSemana()
-        # Consultar las programaciones del usuario para la semana
-        programaciones_usuario = Programacion.objects.filter(
-            usuario__id_user=user_id,
-            fecha_servicio__range=[iniSem, finSem]
-        )
-
-        # Si alguna fecha está activa, redirige a una página de error o muestra un mensaje
-        if programaciones_usuario:
-            semana_activa = Programacion.objects.filter(
-            usuario__id_user=user_id,
-            fecha_servicio__range=[iniSem, finSem]
-            ).first()
-            mensaje = f"Tu menu del dia {semana_activa.fecha_servicio} al {semana_activa.fecha_servicio + timedelta(days=4)} ya fue seleccionado."
-            #return render(request, 'error.html', {'message': mensaje})
-            messages.success(request, mensaje)
-            return redirect('principal')
-        
-        # Si no hay fechas activas, continúa con la lógica normal
-        
-        # Obtener la programación de CasinoColacion para la semana
-        programacion = CasinoColacion.objects.filter(fecha_servicio__range=[iniSem, finSem], id_estado=1)
-        
-        # Agrupar por fecha
-        programacion_dict = defaultdict(list)
-        for registro in programacion:
-            programacion_dict[registro.fecha_servicio].append(registro)
-        
-        # Ordenar la programación por fecha
-        programacion_ordenada = sorted(programacion_dict.items())
-        
-        return render(request, 'usuario/programarmenu.html', {'programacion_ordenada': programacion_ordenada})
-
 #EDITAR MENU
 @login_required
 def editamenu(request, id):
     if request.method == 'GET':
-        consulta = request.GET.get('q')
-        if consulta:
-            menu = CasinoColacion.objects.filter(titulo__icontains=consulta).order_by('fecha_servicio')
-        else:
-            menu = CasinoColacion.objects.filter(id=id)
+        #consulta = request.GET.get('q')
+        #if consulta:
+        #    menu = CasinoColacion.objects.filter(titulo__icontains=consulta).order_by('fecha_servicio')
+        
+        menu = CasinoColacion.objects.filter(id=id).order_by('fecha_servicio', 'id_opciones__opciones')
             
         estado = Estado.objects.all().order_by('id')
         opcion = Opciones.objects.all().order_by('id')
         context = {
             'menus': menu,
-            'query': consulta,
+            #'query': consulta,
             'estados': estado,
             'opciones': opcion,
             'id_menu': id
@@ -312,17 +254,16 @@ def eliminarMenu(request, id):
 #LISTA DEL MENU    
 @login_required
 def menu_lista(request):
-    consulta = request.GET.get('q')
-    if consulta:
-        menu = CasinoColacion.objects.filter(titulo__icontains=consulta).order_by('fecha_servicio')
-    else:
-        menu = CasinoColacion.objects.all().order_by('fecha_servicio') 
-        
+    #consulta = request.GET.get('q')
+    #if consulta:
+    #    menu = CasinoColacion.objects.filter(titulo__icontains=consulta).order_by('fecha_servicio', 'id_opciones__opciones')
+    menu = CasinoColacion.objects.all().order_by('fecha_servicio', 'id_opciones__opciones')
+    
     estado = Estado.objects.all().order_by('id')
     opcion = Opciones.objects.all().order_by('id')
     context = {
         'menus': menu,
-        'query': consulta,
+        #'query': consulta,
         'estados': estado,
         'opciones': opcion
     }
@@ -352,6 +293,65 @@ def cambiar_estado_menu(request):
         menu.save()
         return JsonResponse({'success': True})    
     return JsonResponse({'success': False})
+
+# CREACION METODO SELECCION SEMANA ACTIVA
+def diaDeSemana():
+    # Obtener la fecha actual
+    fechaActual = datetime.now().date()
+    # Calcular el inicio de la semana actual (lunes)
+    inicioSem = fechaActual - timedelta(days=fechaActual.weekday())
+    
+    # Calcular el inicio y fin de la siguiente semana (lunes a viernes)
+    inicioSemSiguiente = inicioSem + timedelta(days=7)
+    finSemSiguiente = inicioSemSiguiente + timedelta(days=4)
+
+    return inicioSemSiguiente, finSemSiguiente
+
+#Programar menu para semana 
+@login_required
+def programarmenu(request):
+        user_id = request.user.id
+        iniSem, finSem = diaDeSemana()
+        # Consultar las programaciones del usuario para la semana
+        programaciones_usuario = Programacion.objects.filter(
+            usuario__id_user=user_id,
+            fecha_servicio__range=[iniSem, finSem]
+        )
+
+        # Si alguna fecha está activa, redirige a una página de error o muestra un mensaje
+        if programaciones_usuario:
+            semana_activa = Programacion.objects.filter(
+            usuario__id_user=user_id,
+            fecha_servicio__range=[iniSem, finSem]
+            ).first()
+            mensaje = f"Tu menu del dia {semana_activa.fecha_servicio} al {semana_activa.fecha_servicio + timedelta(days=4)} ya fue seleccionado."
+            #return render(request, 'error.html', {'message': mensaje})
+            messages.success(request, mensaje)
+            return redirect('principal')
+        
+        # Si no hay fechas activas, continúa con la lógica normal
+        
+        # Obtener la programación de CasinoColacion para la semana
+        programacion = CasinoColacion.objects.filter(fecha_servicio__range=[iniSem, finSem], id_estado=1)
+        
+        # Agrupar por fecha
+        programacion_dict = defaultdict(list)
+        for registro in programacion:
+            programacion_dict[registro.fecha_servicio].append(registro)
+        
+        # Ordenar la programación por fecha
+        programacion_ordenada = sorted(programacion_dict.items())
+        
+        TipoUsuario = Usuarios.objects.get(id_user=user_id)
+        print(TipoUsuario.tipo_usuario_id)
+
+        
+        if TipoUsuario.tipo_usuario_id == 1:
+            print("Empresa", TipoUsuario.tipo_usuario)
+            return render(request, 'usuario/programarmenu_emp.html', {'programacion_ordenada': programacion_ordenada})
+        else:
+            print("Usuario", TipoUsuario.tipo_usuario)
+            return render(request, 'usuario/programarmenu.html', {'programacion_ordenada': programacion_ordenada})
 
 @csrf_exempt  # Desactiva la verificación CSRF para facilitar el desarrollo
 def guardar_selecciones(request):

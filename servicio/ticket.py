@@ -18,11 +18,7 @@ from django.contrib import messages
 if platform.system() == "Windows":
     import win32print
     import win32api
-else:
-    try:
-        import cups
-    except ImportError:
-        cups = None  # CUPS no está disponible en este sistema
+
 
 # Función de impresión para Windows
 def print_pdf_windows(pdf_content):
@@ -41,22 +37,6 @@ def print_pdf_windows(pdf_content):
     except Exception as e:
         print(f"Error printing on Windows: {e}")  # Depuración
 
-# Función de impresión para Linux
-def print_pdf_linux(pdf_content):
-    if cups:
-        try:
-            conn = cups.Connection()
-            printers = conn.getPrinters()
-            printer_name = list(printers.keys())[0]
-            print(f"Using printer: {printer_name}")  # Depuración
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
-                temp_file.write(pdf_content)
-                temp_file.close()
-                conn.printFile(printer_name, temp_file.name, "Job Title", {})
-        except Exception as e:
-            print(f"Error printing on Linux: {e}")  # Depuración
-    else:
-        print("CUPS is not available on this system.")
 
 def generar_ticket(request, usuario_id, fecha):
     if not fecha:
@@ -99,8 +79,7 @@ def generar_ticket(request, usuario_id, fecha):
         # Imprimir el PDF dependiendo del sistema operativo
         if platform.system() == "Windows":
             print_pdf_windows(pdf)
-        else:
-            print_pdf_linux(pdf)
+       
 
         # Marcar como impreso y guardar
         datos.impreso = 1
@@ -112,7 +91,7 @@ def generar_ticket(request, usuario_id, fecha):
         response['Content-Disposition'] = 'attachment; filename="ticket.pdf"'
 
         messages.success(request, "Imprimiendo Ticket.")
-        return response
+        return redirect('principal')
 
     except Programacion.DoesNotExist:
         messages.error(request, "Sin Ticket Disponible.")

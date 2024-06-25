@@ -34,7 +34,7 @@
   }
 
   .titu {
-    font-family: 'Lobster', cursive; /* Cambiar la fuente */
+    font-family: 'arial', cursive; /* Cambiar la fuente */
     text-align: center; /* Centrar el texto */
     font-size: 2em; /* Cambiar el tamaño de la fuente (opcional) */
     color: #333; /* Cambiar el color del texto (opcional) */

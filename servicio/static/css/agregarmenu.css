@@ -46,8 +46,15 @@ footer {
 }
 
 .titu {
-    font-family: 'Impact', cursive; /* Cambiar la fuente */
+    font-family: 'Arial', cursive; /* Cambiar la fuente */
     text-align: center; /* Centrar el texto */
     font-size: 4em; /* Cambiar el tamaño de la fuente (opcional) */
     color: #333; /* Cambiar el color del texto (opcional) */
   }
+
+  .disabled-button {
+    background-color: #f00000; /* Color gris para indicar que está deshabilitado */
+    pointer-events: none; /* Evita que el botón se pueda hacer clic */
+    color: #a9a9a9; /* Cambia el color del texto a gris */
+}
+

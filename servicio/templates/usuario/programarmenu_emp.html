@@ -27,16 +27,12 @@
                 </button>
                 {% endfor %}
                 <center>
-                    <div class="has-addons-centered">
-                        <input type="hidden" name="cant" id="quantity-{{ fecha|date:"Y-m-d" }}-{{ opcion.id }}" value="1" class="cant">
-                        <div class="form-check">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                Dia Administrativo/vacaciones
-                            </label><br>
-                            <input class="form-check-input admin-check" type="checkbox" value="1" onchange="selectOption(this)" style="border: 2px solid #000;">
-                        </div>
+                    <div class="has-addons">
+                        <button type="button" onclick="decrement('quantity-{{ fecha|date:"Y-m-d" }}-{{ opcion.id }}')">-</button>
+                        <input type="text" name="cant" id="quantity-{{ fecha|date:"Y-m-d" }}-{{ opcion.id }}" value="1" class="cant">
+                        <button type="button" onclick="increment('quantity-{{ fecha|date:"Y-m-d" }}-{{ opcion.id }}')">+</button>
                     </div>
-                </center><br>
+                </center>
             </div>
         </div>
     </div>
@@ -62,6 +58,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <!-- Script JavaScript personalizado -->
-<script src="{% static 'js/programarmenu.js' %}"></script>
+<script src="{% static 'js/programarmenu_emp.js' %}"></script>
 
 {% endblock %}

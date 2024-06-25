@@ -1,0 +1,29 @@
+.keyboard {
+    display: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.keyboard .keyboard-row {
+    display: flex;
+    justify-content: center;
+}
+.keyboard button {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    font-size: 24px;
+    border: none;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.keyboard button:hover {
+    background-color: #ddd;
+}
