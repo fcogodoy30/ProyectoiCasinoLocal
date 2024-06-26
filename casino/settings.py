@@ -20,35 +20,34 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SESSION_INACTIVITY_TIMEOUT = 400  # 900 segundos = 15 minutos
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-o=ag8kv2w6evj2d3s)^7=61z%(#tltz4!qpe3w%(%0=l7)35qk'
 
+
+
+
 #DATABASES = {
-#    'default': {
-#       'ENGINE': 'django.db.backends.mysql',
-#        'NAME': 'b5ml3su6hr508ktzvshf',
-#       'USER': 'u6nku6n06iuzjjnp',
-#        'PASSWORD': 'Aw8WXtg6GB5IkTcXvfXr',
-#        'HOST': 'b5ml3su6hr508ktzvshf-mysql.services.clever-cloud.com',  # O la dirección IP de tu servidor MySQL
-#        'PORT': '3306',       # El puerto de MySQL (por defecto es 3306)
+#        'default': {
+#            'ENGINE': 'django.db.backends.mysql',
+#            'NAME': 'CasinoServicios',
+#            'USER': 'root',
+#            'PASSWORD': '2022',
+#            'HOST': 'localhost',
+#            'PORT': '3306',
+#        }
 #    }
-#}
 
 
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'CasinoServicios',
-            'USER': 'root',
-            'PASSWORD': '2022',
-            'HOST': 'localhost',
+            'USER': 'SoporteCasino',
+            'PASSWORD': 'vM5`VxM&8c2#',
+            'HOST': '193.203.167.65',
             'PORT': '3306',
         }
     }
-
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -111,17 +110,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'casino.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -151,7 +139,6 @@ TIME_ZONE = 'America/Santiago'  # Establece la zona horaria correcta
 USE_I18N = True
 
 USE_TZ = True
-
 
 
 
