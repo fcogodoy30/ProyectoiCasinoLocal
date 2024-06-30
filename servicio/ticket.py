@@ -1,14 +1,12 @@
-from datetime import timezone
 import io
+from datetime import timezone
 from django.http import HttpResponse
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from .models import Programacion
-from reportlab.lib.units import cm
-from reportlab.lib.pagesizes import mm
-import os
+from reportlab.lib.units import cm, mm
 import platform
 import tempfile
 from django.utils import timezone
@@ -18,7 +16,6 @@ from django.contrib import messages
 if platform.system() == "Windows":
     import win32print
     import win32api
-
 
 # Función de impresión para Windows
 def print_pdf_windows(pdf_content):
@@ -37,7 +34,6 @@ def print_pdf_windows(pdf_content):
     except Exception as e:
         print(f"Error printing on Windows: {e}")  # Depuración
 
-
 def generar_ticket(request, usuario_id, fecha):
     if not fecha:
         fecha = timezone.now().strftime('%Y-%m-%d')  # Set current date as default
@@ -50,45 +46,47 @@ def generar_ticket(request, usuario_id, fecha):
             return redirect('principal')
 
         buffer = io.BytesIO()
-        # Configurar tamaño de papel para ticket térmico
-        doc = SimpleDocTemplate(buffer, pagesize=(80*mm, 297*mm), rightMargin=5*mm, leftMargin=5*mm, topMargin=5*mm, bottomMargin=5*mm)
         styles = getSampleStyleSheet()
         
         # Crear un nuevo estilo de párrafo con tamaño de fuente ajustado
-        centered_style = ParagraphStyle(name="Centered", alignment=TA_CENTER, fontSize=14)
+        centered_style = ParagraphStyle(name="Centered", alignment=TA_CENTER, fontSize=12)
 
         content = []
         content.append(Paragraph("Ticket Menu", styles['Title']))
         content.append(Paragraph(f"Perfil: {datos.usuario.tipo_usuario}", centered_style))
-        content.append(Paragraph(f"Nombre: {datos.usuario.nombre} {datos.usuario.apellido}", centered_style))
-        content.append(Spacer(0.5, 0.5 * cm))
+        content.append(Paragraph(f"{datos.usuario.nombre} {datos.usuario.apellido}", centered_style))
+        content.append(Spacer(0.2 * cm, 0.2 * cm))
         content.append(Paragraph(f"Fecha: {datos.fecha_servicio.strftime('%Y-%m-%d')}", centered_style))
-        content.append(Spacer(0.2, 0.2 * cm))
-        content.append(Paragraph("", centered_style))
-        content.append(Spacer(0.2, 0.2 * cm))
+        content.append(Spacer(0.2 * cm, 0.2 * cm))
         content.append(Paragraph(f"Menu: {datos.nom_menu}", centered_style))
-        content.append(Paragraph("", centered_style))
-        content.append(Spacer(0.2, 0.2 * cm))
-        content.append(Paragraph(f"Cantidad : {datos.cantidad_almuerzo}", centered_style))
+        content.append(Spacer(0.2 * cm, 0.2 * cm))
+        content.append(Paragraph(f"Cantidad: {datos.cantidad_almuerzo}", centered_style))
 
+        # Calcular la altura total del contenido
+        total_height = 0
+        for elem in content:
+            if isinstance(elem, Paragraph):
+                total_height += 10  # Aproximadamente el tamaño de la fuente más un pequeño margen
+            elif isinstance(elem, Spacer):
+                total_height += elem.height
+
+        # Añadir márgenes
+     
+
+        # Crear el documento con la altura calculada
+        doc = SimpleDocTemplate(buffer, pagesize=(55*mm, total_height*mm), rightMargin=5*mm, leftMargin=5*mm, topMargin=5*mm, bottomMargin=5*mm)
         doc.build(content)
 
         pdf = buffer.getvalue()
         buffer.close()
 
-        # Imprimir el PDF dependiendo del sistema operativo
         if platform.system() == "Windows":
             print_pdf_windows(pdf)
-       
 
         # Marcar como impreso y guardar
         datos.impreso = 1
         datos.fecha_impreso = timezone.now()
         datos.save()
-
-        # Preparar la respuesta para la descarga
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="ticket.pdf"'
 
         messages.success(request, "Imprimiendo Ticket.")
         return redirect('principal')
