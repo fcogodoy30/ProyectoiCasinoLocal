@@ -423,12 +423,6 @@ def control_descarga(request):
     return render(request, 'admin/control_descarga.html')
 
 
-
-
-
-
-
-
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 from .models import Programacion
@@ -456,6 +450,10 @@ def export_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="programacion.pdf"'
 
+    # Aplicar los mismos filtros de la vista ProgramacionListView
+    filter = ProgramacionFilter(request.GET, queryset=Programacion.objects.all())
+    programaciones = filter.qs
+
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
 
@@ -469,7 +467,6 @@ def export_pdf(request):
         ['Usuario', 'Nombre Menu', 'Fecha Servicio', 'Cantidad Almuerzo', 'Impreso', 'Fecha Impreso', 'Fecha Selección']
     ]
 
-    programaciones = Programacion.objects.all()
     for prog in programaciones:
         data.append([
             str(prog.usuario),
