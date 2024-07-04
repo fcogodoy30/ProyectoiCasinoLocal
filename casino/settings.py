@@ -1,6 +1,9 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from servicio.conexBD import check_nube_connection 
+
+
 
 # Cargar las variables de entorno desde el archivo .env
 load_dotenv()
@@ -15,15 +18,28 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-o=ag8kv2w6evj2d3s)^
 
 
 # Configurar la base de datos usando variables de entorno
-DATABASES = {
-    'default': {
+if check_nube_connection():
+    default_db = {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MASTER_DB_NAME'),
-        'USER': os.getenv('MASTER_DB_USER'),
-        'PASSWORD': os.getenv('MASTER_DB_PASSWORD'),
-        'HOST': os.getenv('MASTER_DB_HOST'),
+        'NAME': os.getenv('NUBE_DB_NAME'),
+        'USER': os.getenv('NUBE_DB_USER'),
+        'PASSWORD': os.getenv('NUBE_DB_PASSWORD'),
+        'HOST': os.getenv('NUBE_DB_HOST'),
         'PORT': '3306',
-    },
+    }
+else:
+    default_db = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('LOCAL_DB_NAME'),
+        'USER': os.getenv('LOCAL_DB_USER'),
+        'PASSWORD': os.getenv('LOCAL_DB_PASSWORD'),
+        'HOST': os.getenv('LOCAL_DB_HOST'),
+        'PORT': '3306',
+    }
+
+# Configurar las bases de datos
+DATABASES = {
+    'default': default_db,
     'local': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('LOCAL_DB_NAME'),
@@ -50,7 +66,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'servicio',
+    'django_filters',
+    'django_tables2',
+    'crispy_forms',
+    'crispy_bootstrap4',
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -121,6 +143,7 @@ TIME_ZONE = 'America/Santiago'  # Establece la zona horaria correcta
 USE_I18N = True
 
 USE_TZ = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

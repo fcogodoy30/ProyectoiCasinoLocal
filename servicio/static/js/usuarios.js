@@ -45,9 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 
-
-
-
 document.addEventListener('DOMContentLoaded', function() {
   var password1Input = document.getElementById('id_password1');
   var password2Input = document.getElementById('id_password2');

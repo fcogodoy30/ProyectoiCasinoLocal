@@ -1,8 +1,19 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load crispy_forms_tags %}
+{% load render_table from django_tables2 %}
 
 {% block content %}
-
-<h3> control / descarga </h3>
-
+<div class="col-md-8 bg-white">
+    <center><h3 class="titu">Lista Programaciones</h3></center>
+    <form method="get" action="{% url 'control_descarga' %}">
+        {% crispy filter.form %}
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a href="{% url 'control_descarga' %}" class="button mostrar-todo">Mostrar Todo</a>
+    </form>
+    <br>
+    <div class="table-responsive">
+        {% render_table table %}
+    </div>
+    <a href="{% url 'export_pdf' %}" class="btn btn-secondary">Descargar PDF</a>
+</div>
 {% endblock %}

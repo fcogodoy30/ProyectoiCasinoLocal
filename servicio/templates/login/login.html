@@ -37,6 +37,14 @@
                                 {{error}}
                             </div>
                             {% endif %}
+
+                            {% if msg %}
+                            <div class="alert alert-success" role="alert">
+                                {{msg}}
+                            </div>
+                            {% endif %}
+
+                            
                             <button class="btn btn-dark" type="submit">Entrar</button>
                         </form>
                     </div>

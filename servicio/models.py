@@ -23,6 +23,8 @@ class CasinoColacion(models.Model):
     id_opciones = models.ForeignKey(Opciones, on_delete=models.CASCADE)
     id_estado = models.IntegerField(choices=[(0, 'No visible'), (1, 'visible')], default=1)
     fecha_actualizacion = models.DateTimeField(auto_now_add=True)  # Agrega la fecha de creación
+    _syncing = models.BooleanField(default=False) # Campo de control para evitar la recursión Sincronizacion Base de datos
+    origen = models.CharField(max_length=10, default='nube')
 
     def __str__(self):
         return self.titulo
@@ -42,6 +44,8 @@ class Usuarios(models.Model):
     activo = models.IntegerField(choices=[(0, 'Inactive'), (1, 'Active')], default=1)
     tipo_usuario = models.ForeignKey(TipoUsuario, on_delete=models.CASCADE)
     id_user = models.OneToOneField(User, on_delete=models.CASCADE)
+    _syncing = models.BooleanField(default=False) # Campo de control para evitar la recursión Sincronizacion Base de datos
+    origen = models.CharField(max_length=10, default='nube')
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
@@ -54,7 +58,9 @@ class Programacion(models.Model):
     cantidad_almuerzo = models.IntegerField()
     impreso = models.BooleanField(default=False)
     fecha_impreso = models.DateTimeField(null=True, blank=True)
-    fecha_seleccion = models.DateTimeField(auto_now_add=True)
+    fecha_seleccion = models.DateTimeField(null=True, blank=True)
+    _syncing = models.BooleanField(default=False) # Campo de control para evitar la recursión Sincronizacion Base de datos
+    origen = models.CharField(max_length=10, default='nube')
     
 
     def __str__(self):
