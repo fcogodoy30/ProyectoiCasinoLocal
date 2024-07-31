@@ -18,8 +18,6 @@ from django.contrib import admin
 from django.urls import path
 from servicio import views
 from servicio import ticket
-from django.urls import path
-from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [

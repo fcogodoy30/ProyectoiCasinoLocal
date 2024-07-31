@@ -17,7 +17,7 @@
             <div class="col-12 col-md-8 col-lg-6 col-xl-5 position-relative">
                 <div class="card shadow-2-strong" style="border-radius: 1rem;">
                     <div class="card-body p-5 text-center">
-                        <form name="loginForm" method="POST" action="{% url 'iniciosession' %}" id="loginForm" autocomplete="off">
+                        <form id = "loginForm" name="loginForm" method="POST" action="{% url 'iniciosession' %}" id="loginForm" autocomplete="off">
                             {% csrf_token %}
                             <h3>LOGIN</h3>
                             <br>
@@ -45,7 +45,8 @@
                             {% endif %}
 
                             
-                            <button class="btn btn-dark" type="submit">Entrar</button>
+                            <button class="btn btn-dark" id="entrar" type="submit">Entrar</button>
+                            <center><div id="spinner" class="spinner"></div></center>
                         </form>
                     </div>
                     <div class="keyboard" id="keyboard">
@@ -76,11 +77,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="{% static 'js/validaRut.js' %}"></script>
 <script src="{% static 'js/login.js' %}"></script>
+
+
 <script>
-    // Mover el valor de fakePassword a password antes de enviar el formulario
-    document.getElementById('loginForm').addEventListener('submit', function() {
-        document.getElementById('password').value = document.getElementById('fakePassword').value;
-    });
-</script>
+document.getElementById('loginForm').addEventListener('submit', function () {
+    document.getElementById('password').value = document.getElementById('fakePassword').value;
+  });
+</script>  
+
+
 </body>
 </html>

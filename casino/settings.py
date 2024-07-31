@@ -18,8 +18,19 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-o=ag8kv2w6evj2d3s)^
 
 
 # Configurar la base de datos usando variables de entorno
-if check_nube_connection():
-    default_db = {
+
+
+# Configurar las bases de datos
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('LOCAL_DB_NAME'),
+        'USER': os.getenv('LOCAL_DB_USER'),
+        'PASSWORD': os.getenv('LOCAL_DB_PASSWORD'),
+        'HOST': os.getenv('LOCAL_DB_HOST'),
+        'PORT': '3306',
+    },
+    'remote': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('NUBE_DB_NAME'),
         'USER': os.getenv('NUBE_DB_USER'),
@@ -27,28 +38,37 @@ if check_nube_connection():
         'HOST': os.getenv('NUBE_DB_HOST'),
         'PORT': '3306',
     }
-else:
-    default_db = {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('LOCAL_DB_NAME'),
-        'USER': os.getenv('LOCAL_DB_USER'),
-        'PASSWORD': os.getenv('LOCAL_DB_PASSWORD'),
-        'HOST': os.getenv('LOCAL_DB_HOST'),
-        'PORT': '3306',
-    }
-
-# Configurar las bases de datos
-DATABASES = {
-    'default': default_db,
-    'local': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('LOCAL_DB_NAME'),
-        'USER': os.getenv('LOCAL_DB_USER'),
-        'PASSWORD': os.getenv('LOCAL_DB_PASSWORD'),
-        'HOST': os.getenv('LOCAL_DB_HOST'),
-        'PORT': '3306',
-    }
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',  # Cambiar nivel a ERROR para solo registrar errores
+            'class': 'logging.FileHandler',
+            'filename': 'django_debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',  # Cambiar nivel a ERROR para solo registrar errores
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['file'],
+            'level': 'ERROR',  # Cambiar nivel a ERROR para solo registrar errores de consultas SQL
+            'propagate': False,
+        },
+        'servicio': {
+            'handlers': ['file'],
+            'level': 'ERROR',  # Cambiar nivel a ERROR para solo registrar errores
+            'propagate': True,
+        },
+    },
+}
+
 
 # El resto de tu configuración permanece igual
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -150,6 +170,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -157,3 +178,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'principal'  # Esto redirigirá al usuario a la vista 'principal' después de iniciar sesión
 LOGIN_URL = '/'  # Esta es la URL a la que se redirigirá si un usuario no autenticado intenta acceder a una vista protegida
+
+

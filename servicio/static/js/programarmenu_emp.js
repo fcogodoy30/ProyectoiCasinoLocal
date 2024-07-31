@@ -37,8 +37,9 @@ function validateSelection() {
   });
 
   if (atLeastOneSelected) {
-      document.querySelector('[name="brnEnviar"]').style.display = 'none';
-      document.querySelector('.spinner-border').style.display = 'block';
+    document.querySelector('[name="brnEnviar"]').style.display = 'none';
+    document.querySelector('#volver').style.display = 'none';
+    document.querySelector('.spinner-border').classList.remove('visually-hidden');
       // Enviar los datos seleccionados al servidor usando fetch (AJAX)
       fetch('/guardar_selecciones/', {
           method: 'POST',

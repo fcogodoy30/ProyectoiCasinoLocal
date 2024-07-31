@@ -15,6 +15,22 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import json
 import pytz
+from .funcionesGlobales import obtener_conexiones
+
+
+from django.contrib.auth.decorators import user_passes_test
+
+def check_user_profiles(user, allowed_profiles):
+    return user.is_authenticated and user.usuarios.tipo_usuario.tipo in allowed_profiles
+
+def check_soporte_or_admin(user):
+    return check_user_profiles(user, ['Soporte', 'Empresa'])
+
+def check_soporte(user):
+    return check_user_profiles(user, ['Soporte'])
+
+def check_admin(user):
+    return check_user_profiles(user, ['Empresa'])
 
 
 #login
@@ -37,7 +53,6 @@ def primeringreso(request):
         return render(request,'login/login.html',{
                           'msg': 'Contraseña actualizada, ingrese nuevamente '})
         
-  
 # PRINCIPAL
 @login_required
 def principal(request):
@@ -68,7 +83,7 @@ def iniciosession(request):
             activo = Usuarios.objects.filter(rut = request.POST['username'], activo = 1)
             if activo:
                 ulticonex = user.last_login
-                print(ulticonex) 
+                
                 
                 if ulticonex is not None:
                     login(request, user)
@@ -92,6 +107,7 @@ def iniciosession(request):
 
 #Editar Usuarios
 @login_required
+@user_passes_test(check_soporte_or_admin)
 def editusuario(request, id):
     if request.method == 'GET':
         #consulta = request.GET.get('q')
@@ -144,6 +160,7 @@ def editusuario(request, id):
 
 # Dentro tenemos el guardado del Usuario
 @login_required
+@user_passes_test(check_soporte_or_admin)
 def usuarios(request):
     if request.method == 'GET':
         return redirect('usuarioslistas')
@@ -179,6 +196,7 @@ def usuarios(request):
 
 # lista de usuarios
 @login_required
+@user_passes_test(check_soporte_or_admin)
 def usuarioslistas(request):
     #consulta = request.GET.get('q')
         # Guardamos el Perfil que esta solicitando el dato
@@ -202,6 +220,7 @@ def usuarioslistas(request):
 
 #EDITAR MENU
 @login_required
+@user_passes_test(check_soporte)
 def editamenu(request, id):
     if request.method == 'GET':
         #consulta = request.GET.get('q')
@@ -237,6 +256,7 @@ def editamenu(request, id):
         
 #AGREGAR MENU
 @login_required
+@user_passes_test(check_soporte)
 def agregarmenu(request):
     if request.method == 'GET':
         return redirect('menu_lista')
@@ -268,6 +288,7 @@ def agregarmenu(request):
 
 #ELIMINAR MENU
 @login_required
+@user_passes_test(check_soporte)
 def eliminarMenu(request, id):
     menu = get_object_or_404(CasinoColacion, id=id)
         
@@ -282,6 +303,7 @@ def eliminarMenu(request, id):
         
 #LISTA DEL MENU    
 @login_required
+@user_passes_test(check_soporte)
 def menu_lista(request):
     #consulta = request.GET.get('q')
     #if consulta:
@@ -316,7 +338,6 @@ def cambiar_estado_menu(request):
     if request.method == 'POST':   
         id = request.POST.get('menu_Id')
         estado = request.POST.get('activo')
-        print("estado ",estado )
         menu = CasinoColacion.objects.get(id=id)
         menu.id_estado = estado
         menu.save()
@@ -361,7 +382,7 @@ def programarmenu(request):
         # Si no hay fechas activas, continúa con la lógica normal
         
         # Obtener la programación de CasinoColacion para la semana
-        programacion = CasinoColacion.objects.filter(fecha_servicio__range=[iniSem, finSem], id_estado=1)
+        programacion = CasinoColacion.objects.filter(fecha_servicio__range=[iniSem, finSem], id_estado=1).order_by('fecha_servicio', 'id_opciones_id')
         
         # Agrupar por fecha
         programacion_dict = defaultdict(list)
@@ -372,14 +393,13 @@ def programarmenu(request):
         programacion_ordenada = sorted(programacion_dict.items())
         
         TipoUsuario = Usuarios.objects.get(id_user=user_id)
-        print(TipoUsuario.tipo_usuario_id)
-
         
+               
         if TipoUsuario.tipo_usuario_id == 1:
-            print("Empresa", TipoUsuario.tipo_usuario)
+            
             return render(request, 'usuario/programarmenu_emp.html', {'programacion_ordenada': programacion_ordenada})
         else:
-            print("Usuario", TipoUsuario.tipo_usuario)
+            
             return render(request, 'usuario/programarmenu.html', {'programacion_ordenada': programacion_ordenada})
 
 @csrf_exempt  # Desactiva la verificación CSRF para facilitar el desarrollo
@@ -392,33 +412,45 @@ def guardar_selecciones(request):
             casino_colacion = CasinoColacion.objects.get(id=item['opcion_id'])
             cantidad = item['cant']
             nom_menu = item['nom_menu']
-            
+                           
             now = timezone.now()
             santiago_tz = pytz.timezone('America/Santiago')
             now_santiago = now.astimezone(santiago_tz)
-            
-            
-            print('now',now)
-            print('santiago_tz',santiago_tz)
-            print('now_santiago',now_santiago)
-            
-            
-            
-            Programacion.objects.create(
+
+            nuevo_ingreso = Programacion.objects.create(
                 usuario=usuario,
                 menu_id=casino_colacion.id,
                 nom_menu=nom_menu,
                 fecha_servicio=fecha_servicio,
                 cantidad_almuerzo=cantidad,
                 fecha_seleccion=now_santiago,
-                impreso=0
+                impreso=0,
+                origen = 'local',
+                _syncing=casino_colacion.id_opciones.id
             )
+            
+            local_id = nuevo_ingreso.id
+            
+            # AQUI GUARDAMOS EL REGISTRO TAMBIEN EN LA NUBE SOLO SI HAY CONEXION
+            local_db, remote_db = obtener_conexiones()
+            if remote_db:
+                with remote_db.cursor() as cursor:
+                    
+                    insert_query = """
+                        INSERT INTO servicio_programacion (usuario_id, menu_id, nom_menu, fecha_servicio, cantidad_almuerzo, fecha_seleccion, impreso, origen, _syncing,Id_tabSync)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_query, [
+                        usuario.Id_tabSync, casino_colacion.Id_tabSync, nom_menu, fecha_servicio,
+                        cantidad, now_santiago, 0, 'local', False, local_id
+                    ])
         
         return JsonResponse({ 'status': 'success' })  # Redirige a la página principal
     return JsonResponse({'status': 'fail'}, status=400)
 
 #control y descarga
-
+@login_required
+@user_passes_test(check_soporte)
 def control_descarga(request):
     return render(request, 'admin/control_descarga.html')
 
@@ -446,6 +478,8 @@ class ProgramacionListView(SingleTableMixin, FilterView):
         context['filter'] = ProgramacionFilter(self.request.GET, queryset=self.get_queryset())
         return context
 
+@login_required
+@user_passes_test(check_soporte)
 def export_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="programacion.pdf"'
