@@ -25,3 +25,15 @@ Linux
 Git
 JavaScript
 jQuery
+
+![image](https://github.com/user-attachments/assets/51411384-9d20-4ea6-83ac-3325e76e2333)
+
+![image](https://github.com/user-attachments/assets/42548bbc-c727-4da4-b3e1-a2861c2b65d7)
+
+![image](https://github.com/user-attachments/assets/cc4d43f9-dcf2-4609-bfc3-a40ccd671c6c)
+
+![image](https://github.com/user-attachments/assets/05415a62-8efc-4d3a-8d03-e2f2374ad0f5)
+
+
+
+
